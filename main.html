@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Localwise – Make the decision before you make the investment</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 1. HERO -->
+<header class="hero"><div class="wrap">
+  <p class="eyebrow">AI-Driven Hyper-Local Business Advisory &amp; Financial Structuring Assistant</p>
+  <h1>Localwise</h1>
+  <p class="tag">“Make the decision before you make the investment.”</p>
+  <p class="lead">Understand your local market, discover business opportunities, evaluate available spaces, structure your finances, and test your decision before investing.</p>
+  <div class="btns">
+    <a class="btn" href="#input">Start Business Analysis</a>
+    <button class="btn ghost" onclick="reveal('spaces')">Explore Available Spaces</button>
+  </div>
+</div></header>
+
+<main class="wrap">
+
+<!-- 2. LOCATION & BASIC INPUT -->
+<section class="sec" id="input">
+  <span class="step">STEP 1</span><h2>Where and how much?</h2>
+  <p class="sub">Tell us your area and funding. Demo values are pre-filled.</p>
+  <div class="fields top">
+    <label>Location / Colony<input id="loc" value="Sector 14"></label>
+    <label>City<input id="city" value="Gurugram"></label>
+    <label>Available Capital (₹)<input id="capital" type="number" value="500000"></label>
+    <label>Loan Required %<input id="loanPct" type="number" value="30"></label>
+    <label>Expected Investment (₹)<input id="expInv" type="number" value="700000"></label>
+  </div>
+  <button class="btn" onclick="analyze()">Analyze My Area</button>
+</section>
+
+<div id="app" class="hidden">
+
+<!-- 3. LOCAL BUSINESS TWIN -->
+<section class="sec" id="twin">
+  <span class="step">STEP 2</span><h2>Your Local Business Twin <span class="demo">Prototype / Illustrative Data</span></h2>
+  <p class="sub" id="twinSub"></p>
+  <div class="grid" id="twinStats"></div>
+  <div class="grid" id="twinCards" style="margin-top:14px"></div>
+  <p class="note">Opportunity is estimated using a combination of demand signals, existing supply, distance, and local activity. Zero existing businesses does not guarantee demand. Prototype values are illustrative.</p>
+</section>
+
+<!-- 4. OPPORTUNITIES -->
+<section class="sec" id="opps">
+  <span class="step">STEP 3</span><h2>Potential Business Opportunities</h2>
+  <p class="sub">You don't need to know what to start. Localwise suggests options from local signals.</p>
+  <div class="grid wide" id="oppCards"></div>
+  <div class="card" style="margin-top:14px"><h3>Already have a business idea?</h3>
+    <select id="biz" onchange="selectBusiness(this.value)">
+      <option value="tiffin">Tiffin Service</option><option value="kirana">Kirana Store</option>
+      <option value="cafe">Café</option><option value="salon">Salon</option>
+      <option value="laundry">Laundry Pickup &amp; Delivery</option>
+    </select></div>
+</section>
+
+<!-- LOCAL VOICE (community needs as local demand / problem signals) -->
+<section class="sec" id="voice">
+  <span class="step">COMMUNITY</span><h2>Local Voice <span class="demo">Prototype / Illustrative Data</span></h2>
+  <p class="sub"><b>Tell us what your area needs.</b> Share a local problem, missing service, or business need. Community inputs can help identify potential opportunities in your area.</p>
+  <div class="card voice-form">
+    <label>Area / Colony<input id="voiceArea" placeholder="e.g. Sector 14, Gurugram"></label>
+    <label>What is the problem or need?<textarea id="voiceText" rows="3" placeholder="e.g. Yahan affordable laundry available nahi hai."></textarea></label>
+    <p><button class="btn" onclick="submitLocalNeed()">Submit Local Need</button> <span id="voiceMsg"></span></p>
+  </div>
+  <h3 class="voice-title">What People Are Saying <span class="badge" id="voiceCount"></span></h3>
+  <div class="grid wide" id="voicePosts"></div>
+  <div class="note"><b>How Local Voice helps:</b> Community inputs can be combined with local demand, supply, competition and business data to identify potential business opportunities. One complaint is a single local signal, not proof of an opportunity.</div>
+</section>
+
+<!-- 5. AVAILABLE SPACES -->
+<section class="sec" id="spaces">
+  <span class="step">STEP 4</span><h2>Available Commercial Spaces <span class="demo">Prototype / Illustrative Data</span></h2>
+  <p class="sub">Find publicly listed commercial spaces near your target area.</p>
+  <div class="grid wide" id="spaceCards"></div>
+  <p class="note">Only publicly listed spaces are shown. An unlisted vacant property cannot be reliably detected.</p>
+</section>
+
+<!-- 6. LIST YOUR SPACE -->
+<section class="sec" id="listing">
+  <span class="step">FOR OWNERS</span><h2>List Your Space</h2>
+  <p class="sub">Property owners can add vacant commercial spaces.</p>
+  <div class="fields">
+    <label>Location<input placeholder="Sector 14, Gurugram"></label>
+    <label>Space Type<select><option>Shop</option><option>Kiosk</option><option>Office</option><option>Kitchen space</option></select></label>
+    <label>Area (sq.ft)<input type="number" placeholder="300"></label>
+    <label>Monthly Rent (₹)<input type="number" placeholder="18000"></label>
+    <label>Availability<input placeholder="Available from 1 Nov"></label>
+    <label>Contact<input placeholder="Phone / email"></label>
+    <label>Description<textarea rows="2"></textarea></label>
+    <label>Upload Photos<input type="file" accept="image/*" multiple></label>
+  </div>
+  <p><button class="btn" onclick="$('listMsg').textContent='Prototype: nothing was saved.'">List Space</button> <span id="listMsg"></span></p>
+  <p class="note">Listings would be stored and verified through the backend in the full version.</p>
+</section>
+
+<!-- 7. BUSINESS-SPECIFIC ANALYSIS -->
+<section class="sec" id="bizsec">
+  <span class="step">STEP 5</span><h2 id="bizTitle">Business Requirements</h2>
+  <p class="sub">Each business has its own inputs. Edit any value; everything below recalculates. <span class="demo">Prototype / Illustrative Data</span></p>
+  <div class="fields" id="fields"></div>
+</section>
+
+<!-- 8. PERSONAL FINANCE -->
+<section class="sec" id="personal">
+  <span class="step">STEP 6</span><h2>Your Personal Financial Situation</h2>
+  <p class="sub">Business profit tells you how the business performs. Personal obligations show how much money remains available for your actual life. They are kept separate from business profit.</p>
+  <div class="fields">
+    <label>Household expenses (₹/month)<input class="p" id="p1" type="number" value="15000"></label>
+    <label>Transport (₹/month)<input class="p" id="p2" type="number" value="3000"></label>
+    <label>Children's school fees (₹/month)<input class="p" id="p3" type="number" value="6000"></label>
+    <label>Home rent / EMI (₹/month)<input class="p" id="p4" type="number" value="12000"></label>
+    <label>Existing loan / EMI (₹/month)<input class="p" id="p5" type="number" value="0"></label>
+    <label>Other obligations (₹/month)<input class="p" id="p6" type="number" value="4000"></label>
+  </div>
+</section>
+
+<!-- 9. SNAPSHOT -->
+<section class="sec"><span class="step">STEP 7</span><h2>Financial Snapshot</h2>
+  <div class="grid" id="snap"></div><div id="fundNote" class="note"></div></section>
+
+<!-- 10. MONEY BREAKDOWN -->
+<section class="sec"><h2>Where Your Money Goes</h2>
+  <p class="sub">Monthly running costs, plus one-time costs marked (one-time).</p><div id="money"></div></section>
+
+<!-- 11. WHAT-IF -->
+<section class="sec" id="whatif"><span class="step">STEP 8</span><h2>What If?</h2>
+  <p class="sub">Move the sliders and compare against the current scenario.</p>
+  <div class="fields" id="sliders"></div>
+  <div class="grid" id="whatOut" style="margin-top:14px"></div></section>
+
+<!-- 12. SURVIVAL MODE -->
+<section class="sec"><span class="step">STEP 9</span><h2>Business Survival Mode</h2>
+  <p class="sub">How badly can the business be affected before it becomes unsustainable? Status compares profit after EMI with your personal obligations.</p>
+  <div class="scroll"><table id="survival"></table></div>
+  <p class="note">Prototype financial stress test, not a forecast.</p></section>
+
+<!-- 13. BREAK-EVEN -->
+<section class="sec"><span class="step">STEP 10</span><h2>Break-Even Point</h2><div class="grid" id="be"></div></section>
+
+<!-- 14. REVERSE DECISION -->
+<section class="sec"><span class="step">STEP 11</span><h2>Reverse Decision</h2>
+  <p class="sub">Work backwards from your goal instead of asking "what profit will I make?"</p>
+  <label style="max-width:320px">My target monthly profit (₹)<input id="target" type="number" value="50000"></label>
+  <div class="grid" id="rev" style="margin-top:14px"></div></section>
+
+<!-- 15. PROJECTION -->
+<section class="sec"><span class="step">STEP 12</span><h2>3-Year Projection</h2>
+  <div class="scroll"><table id="proj"></table></div>
+  <p class="note">Prototype projection based on illustrative assumptions (revenue +10%/yr, expenses +6%/yr, personal +5%/yr). Not a guaranteed result.</p></section>
+
+<!-- 16. MOVE COMPARISON -->
+<section class="sec"><h2>What if I move 2 km?</h2>
+  <p class="sub">Area B is assumed to have 25% lower rent and 15% lower demand. <span class="demo">Prototype / Illustrative Data</span></p>
+  <div class="scroll"><table id="cmp"></table></div></section>
+
+<!-- 17. RISK RADAR -->
+<section class="sec"><span class="step">STEP 13</span><h2>Risk Radar</h2><div class="grid wide" id="risk"></div></section>
+
+<!-- 18. EVIDENCE -->
+<section class="sec"><span class="step">STEP 14</span><h2>Why are we recommending this? <span class="demo">Prototype / Illustrative Data</span></h2>
+  <div class="grid" id="evidence"></div>
+  <p class="note">The full product would connect to Maps / Places APIs, property listing sources, public/open datasets, local business data and user-submitted space listings. This prototype uses no live APIs.</p></section>
+
+<!-- 19. REPORT -->
+<section class="sec" id="reportSec"><span class="step">STEP 15</span><h2>Your Business Decision Report</h2>
+  <div class="card report" id="report"></div></section>
+
+</div><!-- end #app -->
+
+<!-- 20. ARCHITECTURE -->
+<section class="sec"><h2>How Localwise Works</h2>
+  <div class="flow"><div>USER</div><span>↓</span><div>LOCAL DATA</div><span>↓</span><div>DEMAND + SUPPLY ANALYSIS</div><span>↓</span><div>BUSINESS OPPORTUNITIES</div><span>↓</span><div>FINANCIAL ENGINE</div><span>↓</span><div>WHAT-IF + STRESS TEST</div><span>↓</span><div>DECISION REPORT</div></div>
+  <p class="note">In the full product, AI would help understand user needs, explain evidence, retrieve relevant information and generate scenarios. Financial calculations would remain deterministic and rule-based.</p></section>
+</main>
+<footer><div class="wrap">Localwise is a decision-support prototype, not financial advice or a guarantee.</div></footer>
+
+<script>
+/* ============ HELPERS ============ */
+const $ = id => document.getElementById(id);
+const inr = n => (n < 0 ? '-₹' : '₹') + Math.abs(Math.round(n)).toLocaleString('en-IN');
+const num = id => parseFloat($(id).value) || 0;
+let cur = 'tiffin', M = null, F = null; // current business, its inputs, its finance result
+
+/* ============ DEMO DATA (no real APIs) ============ */
+const TWIN = [['🏠','8,000','households'],['🏫','3','schools'],['🏢','12','offices'],['💇','17','salons'],['🛒','8','grocery stores'],['🍱','2','tiffin services'],['🧺','0','affordable laundry services']];
+const OPPS = [
+ {k:'laundry',n:'Laundry Pickup & Delivery',d:'High',g:'High',why:'Many offices and households, no affordable provider nearby',sig:'Office density, household count, search interest',comp:'0 affordable providers',dist:'3.2 km'},
+ {k:'tiffin',n:'Tiffin Service',d:'Medium',g:'Medium',why:'12 offices and 3 schools nearby with limited home-style options',sig:'Office lunch demand, working population',comp:'2 providers',dist:'0.9 km'},
+ {k:'kirana',n:'Grocery Delivery',d:'Medium',g:'Medium',why:'Dense housing but 8 stores already serve the area',sig:'Households, repeat purchases',comp:'8 stores',dist:'0.3 km'}];
+const SPACES = [
+ {n:'Shop A',sq:320,rent:18000,km:0.4,t:'Ground-floor shop',fit:'Tiffin / Kirana',av:'Available now'},
+ {n:'Shop B',sq:450,rent:24000,km:0.8,t:'Corner shop',fit:'Café / Salon',av:'From 1 Nov'},
+ {n:'Shop C',sq:280,rent:15000,km:1.1,t:'First-floor unit',fit:'Laundry / Tiffin',av:'Available now'}];
+const EVIDENCE = [['Local business count','62 mapped businesses within 2 km'],['Nearby competitors','2 tiffin providers, 17 salons'],['Distance','Nearest laundry provider ~3.2 km away'],['Demand signals','12 offices, 3 schools, 8,000 households'],['Commercial rent examples','₹50–65 per sq.ft in this area'],['Publicly available listings','3 listed spaces within 1.2 km']];
+
+/* ============ BUSINESS DEFINITIONS ============
+   f = input fields [key, label, default]. map() converts the fields into ONE common
+   shape so a single finance engine can serve every business. */
+const BIZ = {
+ tiffin:{name:'Tiffin Service',unit:'tiffins/day',
+  f:[['cap','Business capacity (tiffins/day)',80],['price','Selling price (₹/tiffin)',120],['days','Working days/month',26],['sqft','Required space (sq.ft)',250],['rent','Monthly rent (₹)',18000],['setup','Setup / interior (₹)',250000],['equip','Kitchen equipment (₹)',350000],['raw','Raw material per tiffin (₹)',45],['pack','Packaging per tiffin (₹)',8],['waste','Expected food waste %',5],['util','Utilities (₹/month)',4000],['staffN','Staff required',2],['sal','Staff salary (₹/person)',12000],['method','Delivery method',0],['deliv','Delivery / platform charges %',0]],
+  map:v=>({units:v.cap,price:v.price,days:v.days,rent:v.rent,setup:v.setup,equip:v.equip,deposit:0,inv:0,raw:v.raw,pack:v.pack,packFix:0,waste:v.waste,staffN:v.staffN,sal:v.sal,util:v.util,deliv:v.deliv,other:0})},
+ kirana:{name:'Kirana Store',unit:'₹ sales/day',money:true,
+  f:[['size','Shop size (sq.ft)',300],['rent','Monthly rent (₹)',20000],['deposit','Security deposit (₹)',60000],['setup','Interior / setup (₹)',80000],['inv','Initial inventory (₹)',200000],['sales','Daily sales (₹)',15000],['margin','Gross margin %',18],['staffN','Staff required',1],['sal','Staff salary (₹/person)',12000],['elec','Electricity (₹/month)',4000],['transport','Restocking / transport (₹/month)',3000],['expiry','Expiry %',1.5],['shrink','Damage / shrinkage %',1],['days','Working days/month',30]],
+  map:v=>({units:v.sales,price:1,days:v.days,rent:v.rent,setup:v.setup,equip:0,deposit:v.deposit,inv:v.inv,raw:1-v.margin/100,pack:0,packFix:0,waste:v.expiry+v.shrink,staffN:v.staffN,sal:v.sal,util:v.elec,deliv:0,other:v.transport})},
+ cafe:{name:'Café',unit:'customers/day',
+  f:[['seats','Seating capacity',20],['cust','Average customers/day',60],['bill','Average bill (₹)',150],['rent','Monthly rent (₹)',30000],['setup','Setup (₹)',150000],['equip','Kitchen equipment (₹)',200000],['rawPct','Raw material cost %',32],['staffN','Staff',3],['sal','Staff salary (₹/person)',14000],['elec','Electricity (₹/month)',8000],['pack','Packaging (₹/month)',4000],['waste','Food waste %',4],['days','Working days/month',30]],
+  map:v=>({units:v.cust,price:v.bill,days:v.days,rent:v.rent,setup:v.setup,equip:v.equip,deposit:0,inv:0,raw:v.bill*v.rawPct/100,pack:0,packFix:v.pack,waste:v.waste,staffN:v.staffN,sal:v.sal,util:v.elec,deliv:0,other:0})},
+ salon:{name:'Salon',unit:'customers/day',
+  f:[['chairs','Chairs / workstations',3],['cust','Customers/day',15],['val','Average service value (₹)',400],['rent','Monthly rent (₹)',25000],['interior','Interior (₹)',150000],['equip','Equipment (₹)',100000],['cons','Products / consumables per customer (₹)',40],['staffN','Staff',3],['sal','Staff salary (₹/person)',15000],['elec','Electricity (₹/month)',5000],['other','Other expenses (₹/month)',5000],['days','Working days/month',28]],
+  map:v=>({units:v.cust,price:v.val,days:v.days,rent:v.rent,setup:v.interior,equip:v.equip,deposit:0,inv:0,raw:v.cons,pack:0,packFix:0,waste:0,staffN:v.staffN,sal:v.sal,util:v.elec,deliv:0,other:v.other})},
+ laundry:{name:'Laundry Pickup & Delivery',unit:'orders/day',
+  f:[['orders','Orders/day',40],['price','Average order value (₹)',150],['days','Working days/month',26],['rent','Monthly rent (₹)',15000],['setup','Setup (₹)',40000],['equip','Machines & equipment (₹)',200000],['cons','Detergent / consumables per order (₹)',20],['staffN','Staff',2],['sal','Staff salary (₹/person)',12000],['util','Utilities (₹/month)',6000],['deliv','Delivery / platform charges %',0]],
+  map:v=>({units:v.orders,price:v.price,days:v.days,rent:v.rent,setup:v.setup,equip:v.equip,deposit:0,inv:0,raw:v.cons,pack:0,packFix:0,waste:0,staffN:v.staffN,sal:v.sal,util:v.util,deliv:v.deliv,other:0})}
+};
+const fmtUnit = n => BIZ[cur].money ? inr(n) + '/day' : Math.round(n) + ' ' + BIZ[cur].unit;
+
+/* ============ CALCULATION ENGINE (plain maths, no AI) ============ */
+function personalTotal(){ return [...document.querySelectorAll('.p')].reduce((s,e)=>s+(parseFloat(e.value)||0),0); }
+
+// EMI = L*r*(1+r)^n / ((1+r)^n - 1), assuming 12% yearly interest over 36 months (illustrative)
+function calcEMI(loan){ const r=0.12/12, n=36; return loan>0 ? loan*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1) : 0; }
+
+// Profit = Revenue - Business expenses. Personal expenses are NOT subtracted here.
+// adj holds "what-if" multipliers (1 = no change).
+function calculateProfit(m, adj={}, loanPct=num('loanPct')){
+  const a = {demand:1,price:1,rent:1,raw:1,staff:1,...adj};
+  const units = m.units*a.demand, price = m.price*a.price;
+  const revenue = units*price*m.days;
+  const raw = units*m.raw*a.raw*m.days;
+  const c = { rent:m.rent*a.rent, raw:raw, pack:units*m.pack*m.days+m.packFix, staff:m.staffN*m.sal*a.staff,
+              util:m.util, delivery:revenue*m.deliv/100, waste:raw*m.waste/100, other:m.other };
+  const expenses = Object.values(c).reduce((s,x)=>s+x,0);
+  const profit = revenue - expenses;
+  // One-time investment = setup + equipment + deposit + inventory + 2 months rent buffer
+  const invest = m.setup+m.equip+m.deposit+m.inv+2*m.rent;
+  const loan = invest*loanPct/100, emi = calcEMI(loan), personal = personalTotal();
+  return {m,a,units,price,revenue,c,expenses,profit,invest,loan,emi,afterEmi:profit-emi,personal,actual:profit-emi-personal};
+}
+
+// Break-even units/day = fixed monthly costs / (profit per unit x working days)
+function calculateBreakEven(f){
+  const m=f.m, contrib = f.price - m.raw*f.a.raw*(1+m.waste/100) - m.pack - f.price*m.deliv/100;
+  const fixed = f.c.rent+f.c.staff+f.c.util+f.c.other+m.packFix;
+  return {contrib, fixed, be: contrib>0 ? fixed/(contrib*m.days) : Infinity};
+}
+
+// Status level: compares profit after EMI with personal obligations
+function status(f){
+  if(f.afterEmi >= f.personal) return 'STABLE';
+  if(f.afterEmi >= f.personal*0.5) return 'STRESSED';
+  return f.afterEmi > 0 ? 'CRITICAL' : 'UNSUSTAINABLE';
+}
+const badge = s => `<span class="badge ${s.toLowerCase()}">${s}</span>`;
+const stat = (l,v,c='') => `<div class="card stat ${c}"><span>${l}</span><b>${v}</b></div>`;
+
+/* ============ PAGE SETUP ============ */
+function analyze(target){
+  $('twinSub').textContent = 'Local picture for ' + $('loc').value + ', ' + $('city').value;
+  $('twinStats').innerHTML = TWIN.map(t=>stat(t[0]+' '+t[2], t[1])).join('');
+  $('twinCards').innerHTML = [['Demand Signals','High office and household activity; 3 schools nearby','high'],['Supply','Services exist for salons and grocery; few for laundry','med'],['Competition','Salon market crowded (17); tiffin and laundry open','low'],['Potential Gap','Laundry and tiffin show the largest estimated gaps','high']]
+    .map(c=>`<div class="card"><h3>${c[0]}</h3><p>${c[1]}</p></div>`).join('');
+  $('oppCards').innerHTML = OPPS.map(o=>`<div class="card"><h3>${o.n}</h3>
+    <p><b>Why detected:</b> ${o.why}</p><p><b>Demand signals:</b> ${o.sig}</p><p><b>Competition:</b> ${o.comp}</p><p><b>Nearest provider:</b> ${o.dist}</p>
+    <p>Demand ${badge(o.d==='High'?'high':'med')} Supply gap ${badge(o.g==='High'?'high':'med')}</p>
+    <button class="btn small" onclick="selectBusiness('${o.k}',true)">Analyze This Business</button></div>`).join('');
+  $('spaceCards').innerHTML = SPACES.map(s=>`<div class="card"><h3>${s.n}</h3><p>${s.sq} sq.ft · ${inr(s.rent)}/month · ${s.km} km away</p>
+    <p>${s.t} · Suits: ${s.fit}</p><p>${badge('low')} ${s.av}</p>
+    <button class="btn small ghost" onclick="alert('${s.n}: ${s.sq} sq.ft, ${inr(s.rent)}/month. Prototype: real listing details would open here.')">View Space</button></div>`).join('');
+  $('sliders').innerHTML = [['demand','Customers / Sales'],['price','Selling price'],['rent','Rent'],['raw','Raw material cost'],['staff','Staff cost']]
+    .map(s=>`<label>${s[1]}: <span id="v_${s[0]}">0%</span><input type="range" id="s_${s[0]}" min="-50" max="50" step="5" value="0"></label>`).join('')
+    + `<label>Loan %: <span id="v_loan"></span><input type="range" id="s_loan" min="0" max="100" step="5" value="${num('loanPct')}"></label>`;
+  buildFields(); reveal(typeof target==='string'?target:'twin');
+}
+function reveal(id){ $('app').classList.remove('hidden'); if(!$('fields').innerHTML){analyze(id);return;} run(); $(id).scrollIntoView({behavior:'smooth'}); }
+function selectBusiness(k, scroll){ cur=k; $('biz').value=k; buildFields(); run(); if(scroll) $('bizsec').scrollIntoView({behavior:'smooth'}); }
+
+// Builds the business-specific input form
+function buildFields(){
+  const b = BIZ[cur]; $('bizTitle').textContent = b.name + ' – Business Requirements';
+  $('fields').innerHTML = b.f.map(([k,l,d]) => k==='method'
+    ? `<label>${l}<select id="f_method" onchange="$('f_deliv').value=this.value;run()"><option value="0">Own Delivery</option><option value="0">Pickup</option><option value="20">Third-party platform (20%)</option></select></label>`
+    : `<label>${l}<input id="f_${k}" type="number" value="${d}"></label>`).join('');
+}
+function readInputs(){ const v={}; BIZ[cur].f.forEach(([k])=>v[k]=num('f_'+k)); return v; }
+
+/* ============ MAIN RUN: recalculates everything ============ */
+function run(){
+  if(!$('fields').innerHTML) return;
+  M = BIZ[cur].map(readInputs()); F = calculateProfit(M);
+  renderSnapshot(); renderMoney(); updateScenario(); renderSurvival(); renderBreakEven(); renderReverse(); renderProjection(); renderCompare(); renderRisk(); renderEvidence(); generateReport();
+}
+document.addEventListener('input', run);
+
+function renderSnapshot(){
+  $('snap').innerHTML = stat('Monthly Revenue',inr(F.revenue)) + stat('Monthly Business Expenses',inr(F.expenses)) + stat('Monthly Business Profit',inr(F.profit),F.profit>0?'pos':'neg')
+    + stat('Personal Obligations',inr(F.personal)) + stat('Initial Investment',inr(F.invest)) + stat('Loan Amount',inr(F.loan))
+    + stat('Estimated EMI (12%, 3 yrs)',inr(F.emi)) + stat('Monthly Cash After EMI',inr(F.afterEmi)) + stat('Actual Monthly Cash (after EMI + personal)',inr(F.actual),F.actual>=0?'pos':'neg');
+  const own = F.invest-F.loan;
+  $('fundNote').textContent = `Modelled investment ${inr(F.invest)} vs. your expected ${inr(num('expInv'))}. Your own contribution ${inr(own)} ${own<=num('capital')?'fits within':'exceeds'} your capital of ${inr(num('capital'))}.`;
+}
+
+function renderMoney(){
+  const c=F.c, m=F.m;
+  const rows=[['Space / Rent',c.rent],['Setup (one-time)',m.setup+m.deposit+m.inv],['Equipment (one-time)',m.equip],['Raw Materials',c.raw],['Packaging',c.pack],['Staff',c.staff],['Utilities',c.util],['Delivery',c.delivery],['Waste',c.waste],['Other Expenses',c.other]];
+  const max=Math.max(...rows.map(r=>r[1]),1);
+  $('money').innerHTML = rows.map(r=>`<div class="bar"><span>${r[0]}</span><i style="width:${r[1]/max*100}%"></i><b>${inr(r[1])}</b></div>`).join('');
+}
+
+// What-if: compare current scenario with slider-changed scenario
+function updateScenario(){
+  const g = k => 1 + num('s_'+k)/100;
+  ['demand','price','rent','raw','staff'].forEach(k=>$('v_'+k).textContent=(num('s_'+k)>0?'+':'')+num('s_'+k)+'%');
+  $('v_loan').textContent = num('s_loan')+'%';
+  const n = calculateProfit(M,{demand:g('demand'),price:g('price'),rent:g('rent'),raw:g('raw'),staff:g('staff')},num('s_loan'));
+  const dP=n.profit-F.profit, dC=n.actual-F.actual;
+  $('whatOut').innerHTML = stat('Current Profit',inr(F.profit)) + stat('Changed Profit',inr(n.profit)) + stat('Difference in Profit',inr(dP),dP>=0?'pos':'neg')
+    + stat('Current Cash',inr(F.actual)) + stat('Changed Cash',inr(n.actual)) + stat('Difference in Cash',inr(dC),dC>=0?'pos':'neg');
+}
+
+function renderSurvival(){
+  const sc=[['Demand -10%',{demand:.9}],['Demand -20%',{demand:.8}],['Demand -30%',{demand:.7}],['Rent +20%',{rent:1.2}],['Raw material +15%',{raw:1.15}],['Selling price -10%',{price:.9}],['Combined: demand -20%, rent +20%, raw +15%',{demand:.8,rent:1.2,raw:1.15}]];
+  $('survival').innerHTML = '<tr><th>Scenario</th><th>Profit</th><th>Cash after EMI &amp; personal</th><th>Status</th></tr>'
+    + [['Current',{}]].concat(sc).map(([n,a])=>{const r=calculateProfit(M,a);return `<tr><td>${n}</td><td>${inr(r.profit)}</td><td>${inr(r.actual)}</td><td>${badge(status(r))}</td></tr>`}).join('');
+}
+
+function renderBreakEven(){
+  const b=calculateBreakEven(F), gap=F.units-b.be;
+  $('be').innerHTML = stat('Break-even',b.be===Infinity?'Not reachable':fmtUnit(b.be)) + stat('Current expected',fmtUnit(F.units)) + stat('Safety gap',b.be===Infinity?'-':fmtUnit(gap),gap>0?'pos':'neg');
+}
+
+// Reverse decision: work backwards from a target profit
+function renderReverse(){
+  const T=num('target'), b=calculateBreakEven(F), ratio=b.contrib/F.price;
+  const rev = ratio>0 ? (T+b.fixed)/ratio : Infinity;
+  const unitsDay = rev/(F.price*M.days);
+  const maxRent = b.contrib*F.units*M.days - (b.fixed-F.c.rent) - T; // rent that still leaves the target profit
+  $('rev').innerHTML = stat('Required monthly revenue',inr(rev)) + stat('Required per day',fmtUnit(unitsDay)) + stat('Maximum affordable rent',inr(maxRent)) + stat('Approx. capital needed',inr(F.invest));
+}
+
+function renderProjection(){
+  let h='<tr><th></th><th>Year 1</th><th>Year 2</th><th>Year 3</th></tr>', y=[0,1,2].map(i=>{
+    const rev=F.revenue*12*Math.pow(1.10,i), exp=F.expenses*12*Math.pow(1.06,i), pers=F.personal*12*Math.pow(1.05,i);
+    return {rev,exp,pf:rev-exp,pers,emi:F.emi*12,cash:rev-exp-pers-F.emi*12};});
+  [['Revenue','rev'],['Expenses','exp'],['Business Profit','pf'],['Personal Obligations','pers'],['EMI','emi'],['Cash After Personal Obligations','cash']]
+    .forEach(([l,k])=>h+=`<tr><td>${l}</td>${y.map(r=>`<td>${inr(r[k])}</td>`).join('')}</tr>`);
+  $('proj').innerHTML=h;
+}
+
+function renderCompare(){
+  const B=calculateProfit(M,{rent:.75,demand:.85}), bA=calculateBreakEven(F), bB=calculateBreakEven(B);
+  $('cmp').innerHTML = `<tr><th></th><th>Area A (current)</th><th>Area B (+2 km)</th></tr>
+   <tr><td>Rent</td><td>${inr(F.c.rent)}</td><td>${inr(B.c.rent)}</td></tr>
+   <tr><td>Demand</td><td>${fmtUnit(F.units)}</td><td>${fmtUnit(B.units)}</td></tr>
+   <tr><td>Competition</td><td>Medium</td><td>Low</td></tr>
+   <tr><td>Required per day</td><td>${fmtUnit(bA.be)}</td><td>${fmtUnit(bB.be)}</td></tr>
+   <tr><td>Estimated profit</td><td>${inr(F.profit)}</td><td>${inr(B.profit)}</td></tr>
+   <tr><td>Financial stress</td><td>${badge(status(F))}</td><td>${badge(status(B))}</td></tr>`;
+}
+
+// Risk levels come from simple ratio rules
+function riskList(){
+  const lvl=(x,hi,md)=>x>=hi?'High':x>=md?'Medium':'Low', b=calculateBreakEven(F), rv=F.revenue||1, pf=Math.max(F.profit,1);
+  return [
+   ['High Rent',lvl(F.c.rent/rv,.15,.10),'Rent is '+Math.round(F.c.rent/rv*100)+'% of revenue.'],
+   ['High Competition','Medium','Similar providers exist nearby (illustrative).'],
+   ['Low Demand',lvl(b.be===Infinity?9:b.be/F.units,.8,.6),'Break-even needs '+(b.be===Infinity?'more than possible':Math.round(b.be/F.units*100)+'% of expected volume')+'.'],
+   ['High Raw Material Cost',lvl(F.c.raw/rv,.5,.35),'Raw materials are '+Math.round(F.c.raw/rv*100)+'% of revenue.'],
+   ['High Personal Obligations',lvl(F.personal/pf,.6,.35),'Personal costs use '+Math.round(F.personal/pf*100)+'% of profit.'],
+   ['High EMI',lvl(F.emi/pf,.3,.15),'EMI uses '+Math.round(F.emi/pf*100)+'% of profit.'],
+   ['Food Waste',lvl(M.waste,8,4),'Waste assumed at '+M.waste+'%.'],
+   ['Staff Dependency',lvl(F.c.staff/(F.expenses||1),.45,.3),'Staff are '+Math.round(F.c.staff/(F.expenses||1)*100)+'% of expenses.']];
+}
+function renderRisk(){
+  $('risk').innerHTML = riskList().map(r=>`<div class="card"><h3>${r[0]} ${badge(r[1]==='Medium'?'med':r[1].toLowerCase())}</h3><p>${r[2]}</p></div>`).join('');
+}
+function renderEvidence(){ $('evidence').innerHTML = EVIDENCE.map(e=>`<div class="card"><h3>${e[0]}</h3><p>${e[1]}</p><span class="demo">Prototype / Illustrative Data</span></div>`).join(''); }
+
+// Neutral decision summary (never a plain "YES, START")
+function generateReport(){
+  const b=calculateBreakEven(F), st=status(F), risks=riskList().filter(r=>r[1]!=='Low').map(r=>r[0]);
+  const ok = F.actual>0 && b.be<F.units;
+  $('report').innerHTML = `<div class="grid">
+    ${stat('Business',BIZ[cur].name)}${stat('Location',$('loc').value+', '+$('city').value)}${stat('Estimated Investment',inr(F.invest))}
+    ${stat('Monthly Revenue',inr(F.revenue))}${stat('Monthly Expenses',inr(F.expenses))}${stat('Business Profit',inr(F.profit))}
+    ${stat('Personal Obligations',inr(F.personal))}${stat('Actual Monthly Cash',inr(F.actual),F.actual>=0?'pos':'neg')}
+    ${stat('Break-even',fmtUnit(b.be))}<div class="card stat"><span>Stress Test</span>${badge(st)}</div></div>
+    <p><b>Summary:</b> ${ok?'Financially viable under the current prototype assumptions.':'Financially tight under the current prototype assumptions.'}</p>
+    <p><b>Main sensitivity:</b> customer demand and rent.</p>
+    <p><b>Main risks:</b> ${risks.length?risks.join(', '):'none flagged at current inputs'}.</p>
+    <p><b>Why this opportunity:</b> local demand signals (offices, schools, households) and limited nearby supply. Illustrative data.</p>
+    <p><b>Recommended next checks:</b></p><ul><li>Visit the area and count real footfall</li><li>Confirm rent and deposit with the property owner</li><li>Check licences (e.g. FSSAI, shop registration)</li><li>Talk to 10 potential customers</li></ul>
+    <p class="note">This result should be validated with real local data before investment. Localwise is decision support, not a guarantee.</p>`;
+}
+
+/* ============ LOCAL VOICE ============
+   Community posts are kept in a simple array (no backend). Newest post goes first. */
+const VOICE_POSTS = [
+ {cat:'Stationery',area:'Sector 14, Gurugram',label:'Demand Signal',text:'Hamari colony mein achhi stationery shop nahi hai. School supplies ke liye bahar jana padta hai.'},
+ {cat:'Dairy',area:'Sector 14, Gurugram',label:'Service Gap',text:'Yahan dairy products ki quality consistent nahi hai. Ek reliable dairy shop ki zarurat hai.'},
+ {cat:'Laundry',area:'Sector 15, Gurugram',label:'Availability Gap',text:'Affordable laundry pickup and delivery available nahi hai.'},
+ {cat:'Fruits',area:'Sector 14, Gurugram',label:'Service Gap',text:'Fresh fruits ki achhi shop nahi hai.'}];
+
+// Guess a short category from keywords in the text (simple demo logic)
+function guessCategory(text){
+  const t = text.toLowerCase();
+  const words = [['stationery','Stationery'],['dairy','Dairy'],['doodh','Dairy'],['laundry','Laundry'],['fruit','Fruits'],['tiffin','Tiffin'],['salon','Salon']];
+  for(const [w,c] of words){ if(t.includes(w)) return c; }
+  return 'General';
+}
+
+// Draw all posts and update the count (textContent keeps typed text safe)
+function renderVoice(){
+  $('voiceCount').textContent = VOICE_POSTS.length + ' community inputs';
+  $('voicePosts').innerHTML = '';
+  VOICE_POSTS.forEach(p=>{
+    const card = document.createElement('div'); card.className = 'card post';
+    const head = document.createElement('div'); head.className = 'post-head';
+    const cat = document.createElement('h3'); cat.textContent = p.cat;
+    const tag = document.createElement('span'); tag.className = 'badge med'; tag.textContent = p.label;
+    head.append(cat, tag);
+    const quote = document.createElement('p'); quote.className = 'post-text'; quote.textContent = '“' + p.text + '”';
+    const area = document.createElement('p'); area.textContent = '📍 ' + p.area;
+    card.append(head, quote, area);
+    $('voicePosts').appendChild(card);
+  });
+}
+
+// Add a new post at the top when the user submits the form
+function submitLocalNeed(){
+  const area = $('voiceArea').value.trim(), text = $('voiceText').value.trim();
+  if(!area || !text){ $('voiceMsg').textContent = 'Please fill in both fields.'; return; }
+  VOICE_POSTS.unshift({cat:guessCategory(text), area:area, label:'Local Signal', text:text});
+  $('voiceArea').value = ''; $('voiceText').value = '';
+  $('voiceMsg').textContent = 'Added. Prototype: not saved to a server.';
+  renderVoice();
+}
+renderVoice();
+</script>
+</body>
+</html>
+
+
+
